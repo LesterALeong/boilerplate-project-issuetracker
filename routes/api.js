@@ -21,18 +21,17 @@ module.exports = function (app) {
       const issues = getIssues(project);
 
       const allowed = [
-        '_id','issue_title','issue_text','created_by',
-        'assigned_to','status_text','open','created_on','updated_on'
+        '_id', 'issue_title', 'issue_text', 'created_by',
+        'assigned_to', 'status_text', 'open', 'created_on', 'updated_on'
       ];
 
       const filtered = issues.filter((doc) => {
         for (const [k, v] of Object.entries(req.query)) {
           if (!allowed.includes(k)) continue;
           if (k === 'open') {
-            const want = v === 'true' || v === true;
+            const want = v === 'true' || v === true; // handle "true"/"false" strings
             if (doc.open !== want) return false;
           } else {
-            // compare as strings for simplicity (dates stringify nicely)
             if (String(doc[k]) !== String(v)) return false;
           }
         }
@@ -79,7 +78,6 @@ module.exports = function (app) {
       const { _id, ...rest } = req.body || {};
       if (!_id) return res.json({ error: 'missing _id' });
 
-      // find across the project in the route
       const project = req.params.project;
       const issues = getIssues(project);
       const idx = issues.findIndex((i) => String(i._id) === String(_id));
@@ -92,11 +90,10 @@ module.exports = function (app) {
       for (const k of updatable) {
         if (rest[k] !== undefined && rest[k] !== '') {
           if (k === 'open') {
-            updateDoc.open = (rest[k] === true || rest[k] === 'true')
-              ? true
-              : (rest[k] === false || rest[k] === 'false')
-              ? false
-              : rest[k];
+            updateDoc.open =
+              (rest[k] === true || rest[k] === 'true') ? true :
+              (rest[k] === false || rest[k] === 'false') ? false :
+              rest[k];
           } else {
             updateDoc[k] = rest[k];
           }
