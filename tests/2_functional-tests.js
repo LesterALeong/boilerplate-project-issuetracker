@@ -195,4 +195,33 @@ suite('Functional Tests', function () {
       .send({ _id: idRequiredOnly })
       .end((err, res) => {
         assert.equal(res.status, 200);
-        assert.deepEqual(res.body, { result: 'succes
+        assert.deepEqual(res.body, { result: 'successfully deleted', _id: idRequiredOnly });
+        done();
+      });
+  });
+
+  // 13. Delete invalid _id
+  test('Delete an issue with an invalid _id: DELETE /api/issues/{project}', (done) => {
+    const bad = 'ffffffffffffffffffffffff';
+    chai.request(server)
+      .delete(`/api/issues/${project}`)
+      .send({ _id: bad })
+      .end((err, res) => {
+        assert.equal(res.status, 200);
+        assert.deepEqual(res.body, { error: 'could not delete', _id: bad });
+        done();
+      });
+  });
+
+  // 14. Delete missing _id
+  test('Delete an issue with missing _id: DELETE /api/issues/{project}', (done) => {
+    chai.request(server)
+      .delete(`/api/issues/${project}`)
+      .send({})
+      .end((err, res) => {
+        assert.equal(res.status, 200);
+        assert.deepEqual(res.body, { error: 'missing _id' });
+        done();
+      });
+  });
+});
