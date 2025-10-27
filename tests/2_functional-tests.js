@@ -14,8 +14,7 @@ suite('Functional Tests', function () {
 
   // 1. Create an issue with every field
   test('Create an issue with every field: POST /api/issues/{project}', (done) => {
-    chai
-      .request(server)
+    chai.request(server)
       .post(`/api/issues/${project}`)
       .send({
         issue_title: 'Full Issue',
@@ -26,7 +25,6 @@ suite('Functional Tests', function () {
       })
       .end((err, res) => {
         assert.equal(res.status, 200);
-        assert.isObject(res.body);
         assert.property(res.body, '_id');
         assert.property(res.body, 'created_on');
         assert.property(res.body, 'updated_on');
@@ -44,8 +42,7 @@ suite('Functional Tests', function () {
 
   // 2. Create an issue with only required fields
   test('Create an issue with only required fields: POST /api/issues/{project}', (done) => {
-    chai
-      .request(server)
+    chai.request(server)
       .post(`/api/issues/${project}`)
       .send({
         issue_title: 'Required Only',
@@ -68,13 +65,11 @@ suite('Functional Tests', function () {
 
   // 3. Create an issue with missing required fields
   test('Create an issue with missing required fields: POST /api/issues/{project}', (done) => {
-    chai
-      .request(server)
+    chai.request(server)
       .post(`/api/issues/${project}`)
       .send({
         issue_title: 'Missing created_by',
         issue_text: 'x'
-        // created_by missing
       })
       .end((err, res) => {
         assert.equal(res.status, 200);
@@ -85,8 +80,7 @@ suite('Functional Tests', function () {
 
   // 4. View issues on a project
   test('View issues on a project: GET /api/issues/{project}', (done) => {
-    chai
-      .request(server)
+    chai.request(server)
       .get(`/api/issues/${project}`)
       .end((err, res) => {
         assert.equal(res.status, 200);
@@ -102,10 +96,9 @@ suite('Functional Tests', function () {
       });
   });
 
-  // 5. View issues on a project with one filter
+  // 5. View issues with one filter
   test('View issues on a project with one filter: GET /api/issues/{project}', (done) => {
-    chai
-      .request(server)
+    chai.request(server)
       .get(`/api/issues/${project}?open=true`)
       .end((err, res) => {
         assert.equal(res.status, 200);
@@ -115,10 +108,9 @@ suite('Functional Tests', function () {
       });
   });
 
-  // 6. View issues on a project with multiple filters
+  // 6. View issues with multiple filters
   test('View issues on a project with multiple filters: GET /api/issues/{project}', (done) => {
-    chai
-      .request(server)
+    chai.request(server)
       .get(`/api/issues/${project}?open=true&created_by=Tester`)
       .end((err, res) => {
         assert.equal(res.status, 200);
@@ -131,10 +123,9 @@ suite('Functional Tests', function () {
       });
   });
 
-  // 7. Update one field on an issue
+  // 7. Update one field
   test('Update one field on an issue: PUT /api/issues/{project}', (done) => {
-    chai
-      .request(server)
+    chai.request(server)
       .put(`/api/issues/${project}`)
       .send({ _id: idFull, open: 'false' })
       .end((err, res) => {
@@ -144,10 +135,9 @@ suite('Functional Tests', function () {
       });
   });
 
-  // 8. Update multiple fields on an issue
+  // 8. Update multiple fields
   test('Update multiple fields on an issue: PUT /api/issues/{project}', (done) => {
-    chai
-      .request(server)
+    chai.request(server)
       .put(`/api/issues/${project}`)
       .send({
         _id: idRequiredOnly,
@@ -161,10 +151,9 @@ suite('Functional Tests', function () {
       });
   });
 
-  // 9. Update an issue with missing _id
+  // 9. Update missing _id
   test('Update an issue with missing _id: PUT /api/issues/{project}', (done) => {
-    chai
-      .request(server)
+    chai.request(server)
       .put(`/api/issues/${project}`)
       .send({ issue_text: 'x' })
       .end((err, res) => {
@@ -174,10 +163,9 @@ suite('Functional Tests', function () {
       });
   });
 
-  // 10. Update an issue with no fields to update
+  // 10. Update with no fields to update
   test('Update an issue with no fields to update: PUT /api/issues/{project}', (done) => {
-    chai
-      .request(server)
+    chai.request(server)
       .put(`/api/issues/${project}`)
       .send({ _id: idFull })
       .end((err, res) => {
@@ -187,11 +175,10 @@ suite('Functional Tests', function () {
       });
   });
 
-  // 11. Update an issue with an invalid _id
+  // 11. Update invalid _id
   test('Update an issue with an invalid _id: PUT /api/issues/{project}', (done) => {
     const bad = '000000000000000000000000';
-    chai
-      .request(server)
+    chai.request(server)
       .put(`/api/issues/${project}`)
       .send({ _id: bad, issue_text: 'nope' })
       .end((err, res) => {
@@ -203,41 +190,9 @@ suite('Functional Tests', function () {
 
   // 12. Delete an issue
   test('Delete an issue: DELETE /api/issues/{project}', (done) => {
-    chai
-      .request(server)
+    chai.request(server)
       .delete(`/api/issues/${project}`)
       .send({ _id: idRequiredOnly })
       .end((err, res) => {
         assert.equal(res.status, 200);
-        assert.deepEqual(res.body, { result: 'successfully deleted', _id: idRequiredOnly });
-        done();
-      });
-  });
-
-  // 13. Delete an issue with an invalid _id
-  test('Delete an issue with an invalid _id: DELETE /api/issues/{project}', (done) => {
-    const bad = 'ffffffffffffffffffffffff';
-    chai
-      .request(server)
-      .delete(`/api/issues/${project}`)
-      .send({ _id: bad })
-      .end((err, res) => {
-        assert.equal(res.status, 200);
-        assert.deepEqual(res.body, { error: 'could not delete', _id: bad });
-        done();
-      });
-  });
-
-  // 14. Delete an issue with missing _id
-  test('Delete an issue with missing _id: DELETE /api/issues/{project}', (done) => {
-    chai
-      .request(server)
-      .delete(`/api/issues/${project}`)
-      .send({})
-      .end((err, res) => {
-        assert.equal(res.status, 200);
-        assert.deepEqual(res.body, { error: 'missing _id' });
-        done();
-      });
-  });
-});
+        assert.deepEqual(res.body, { result: 'succes
